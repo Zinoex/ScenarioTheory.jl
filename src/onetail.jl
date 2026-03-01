@@ -1,31 +1,28 @@
-struct OneTailViolation <: AbstractViolation
-    k::Int
-    N::Int
+struct CompresionOneTail <: AbstractScenarioProblem
+    samples::Int
+    compressed::Int
 
-    function OneTailViolation(k::Int, N::Int)
-        if N < 1
-            throw(DomainError(N, "expected N ≥ 1"))
+    function CompresionOneTail(samples::Int, compressed::Int)
+        if samples < 1
+            throw(DomainError(samples, "expected N ≥ 1"))
         end
 
-        if k < 0
-            throw(DomainError(k, "expected k ≥ 0"))
+        if compressed < 0
+            throw(DomainError(compressed, "expected compressed ≥ 0"))
         end
         
-        if k > N
-            throw(ArgumentError("expected k ≤ N"))
+        if compressed > samples
+            throw(ArgumentError("expected compressed ≤ samples"))
         end
         
-        return new(k, N)
+        return new(samples, compressed)
     end
 end
 
-numfailure(dist::OneTailViolation) = dist.k
-numscenarios(dist::OneTailViolation) = dist.N
-
-function psi(dist::OneTailViolation, β::Real, α::Real)
+function psi(dist::CompresionOneTail, β::Real, α::Real)
     # $$ \Psi_{k,\delta}(\alpha) = \frac{\delta}{N}\sum_{m=k}^{N-1} \frac{\binom{m}{k}}{\binom{N}{k}} (1-\alpha)^{-(N-m)} $$
-    k = dist.k
-    N = dist.N
+    k = dist.compressed
+    N = dist.samples
 
     if α < 0 || α > 1
         throw(DomainError(α, "expected α ∈ (0, 1)"))
@@ -50,17 +47,21 @@ function psi(dist::OneTailViolation, β::Real, α::Real)
     return βT / T(N) * coeff * ratio
 end
 
-function violation(dist::OneTailViolation, β::Real; tol=1e-10)
-    if numsuccess(dist) == 0
-        ϵ = 1
+function violation(dist::CompresionOneTail, β::Real; tol=1e-10)
+    N = dist.samples
+    k = dist.compressed
+    l = N - k
+
+    if l == 0
+        ϵ = 1.0
     else
-        α_lower = 0
-        α_upper = 1
+        α_lower = 0.0
+        α_upper = 1.0
         while α_upper - α_lower > tol
             α = (α_lower + α_upper) / 2
 
-            left = β * betainc(numfailure(dist) + 1, numsuccess(dist), α)
-            right = α * dist.N * (betainc(numfailure(dist), numsuccess(dist) + 1, α) - betainc(numfailure(dist) + 1, numsuccess(dist), α))
+            left = β * betainc(k + 1, l, α)
+            right = α * N * (betainc(k, l + 1, α) - betainc(k + 1, l, α))
             
             if left > right
                 α_upper = α
@@ -71,8 +72,4 @@ function violation(dist::OneTailViolation, β::Real; tol=1e-10)
         ϵ = α_upper
     end
     return zero(ϵ), ϵ
-end
-
-function confidence(dist::OneTailViolation, ϵ::Tuple{<:Real, <:Real}; tol=1e-10)
-    throw(ArgumentError("confidence is not implemented for OneTailViolation"))
 end

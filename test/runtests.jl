@@ -1,6 +1,6 @@
 using ScenarioTheory
-using Test
+using Test, Supposition, Supposition.Data
 
 @testset "ScenarioTheory.jl" begin
-    # Write your tests here.
+    include("scenario_opt.jl")
 end
