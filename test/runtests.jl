@@ -5,4 +5,5 @@ using Test, Supposition, Supposition.Data
     include("scenario_opt.jl")
     include("wait_and_judge.jl")
     include("onetail.jl")
+    # include("twotail.jl")
 end

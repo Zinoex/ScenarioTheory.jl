@@ -1,4 +1,4 @@
-@testset "Compression One-tail" begin
+@testset "Compression Two-tail" begin
     # 10M samples should be good enough for testing purposes, but we can go higher if needed.
     samples_gen = Data.Integers(1, 10_000_000)
     compression_gen = Data.Integers(1, 10_000_000)
@@ -18,14 +18,27 @@
 
     Supposition.@check function scenario_opt(sample_compression=sc_gen, β=beta_gen)
         samples, compression = sample_compression
-        dist = CompressionOneTail(samples, compression)
+        dist = CompressionTwoTail(samples, compression)
         ϵ = violation(dist, β)
-        ϵ[1] == 0.0 && 0.0 <= ϵ[2] <= 1.0
+        0.0 <= ϵ[1] <= 1.0 && 0.0 <= ϵ[2] <= 1.0 && ϵ[1] <= ϵ[2]
+    end
+
+    # Check one-tail vs two-tail
+    Supposition.@check function one_tail_vs_two_tail(sample_compression=sc_gen, β=beta_gen)
+        samples, compression = sample_compression
+
+        dist_one_tail = CompressionOneTail(samples, compression)
+        ϵ_one_tail = violation(dist_one_tail, β)
+
+        dist_two_tail = CompressionTwoTail(samples, compression)
+        ϵ_two_tail = violation(dist_two_tail, β)
+
+        ϵ_one_tail[2] <= ϵ_two_tail[2]
     end
 
     # Check that if samples == compression, then ϵ = 1.0
     Supposition.@check function samples_equal_compression(samples=samples_gen, β=beta_gen)
-        dist = CompressionOneTail(samples, samples)
+        dist = CompressionTwoTail(samples, samples)
         ϵ = violation(dist, β)
         ϵ[2] == 1.0
     end
@@ -38,13 +51,13 @@
     Supposition.@check function successor_compression(sample_compression=sc_gen, β=beta_gen)
         samples, compression = sample_compression
 
-        dist1 = CompressionOneTail(samples, compression)
+        dist1 = CompressionTwoTail(samples, compression)
         ϵ1 = violation(dist1, β)
         
-        dist2 = CompressionOneTail(samples, compression + 1)
+        dist2 = CompressionTwoTail(samples, compression + 1)
         ϵ2 = violation(dist2, β)
         
-        ϵ1[2] <= ϵ2[2]
+        ϵ1[1] <= ϵ2[1] && ϵ1[2] <= ϵ2[2]
     end
 
     # More samples should lead to lower violation, all else equal.
@@ -55,13 +68,13 @@
     Supposition.@check function successor_samples(sample_compression=sc_gen, β=beta_gen)
         samples, compression = sample_compression
 
-        dist1 = CompressionOneTail(samples, compression)
+        dist1 = CompressionTwoTail(samples, compression)
         ϵ1 = violation(dist1, β)
 
-        dist2 = CompressionOneTail(samples + 1, compression)
+        dist2 = CompressionTwoTail(samples + 1, compression)
         ϵ2 = violation(dist2, β)
 
-        ϵ1[2] >= ϵ2[2]
+        ϵ1[1] >= ϵ2[1] && ϵ1[2] >= ϵ2[2]
     end
 
     # Higher β (less confidence) should lead to smaller violation, all else equal.
@@ -73,27 +86,34 @@
         samples, compression = sample_compression
         β1, β2 = β
 
-        dist = CompressionOneTail(samples, compression)
-        ϵ1 = violation(dist, β1)
-        ϵ2 = violation(dist, β2)
+        dist1 = CompressionTwoTail(samples, compression)
+        ϵ1 = violation(dist1, β1)
 
-        ϵ1[2] >= ϵ2[2]
+        dist2 = CompressionTwoTail(samples, compression)
+        ϵ2 = violation(dist2, β2)
+
+        event!("ϵ1", ϵ1)
+        event!("ϵ2", ϵ2)
+
+        # Should I expect ϵ1[1] <= ϵ2[1] or ϵ1[1] >= ϵ2[1] for higher β?
+
+        ϵ1[1] >= ϵ2[1] && ϵ1[2] >= ϵ2[2]
     end
 
     # Soundness: the true violation should be at most ϵ with confidence at least β.
-    Supposition.@check function violation_soundness(sample_compression=sc_gen, β=beta_gen)
-        samples, compression = sample_compression
-        dist = CompressionOneTail(samples, compression)
-        ϵ = violation(dist, β)[2]
+    # Supposition.@check function violation_soundness(sample_compression=sc_gen, β=beta_gen)
+    #     samples, compression = sample_compression
+    #     dist = CompressionTwoTail(samples, compression)
+    #     ϵ = violation(dist, β)[2]
 
-        # Compute the oracle confidence using the regularized incomplete beta function.
-        k = compression
-        l = samples - k
-        β_roundtrip = ϵ * samples * (ScenarioTheory.betainc(k, l + 1, ϵ) - ScenarioTheory.betainc(k + 1, l, ϵ)) / (1.0 - ScenarioTheory.betainc(l, k + 1, 1.0 - ϵ))
-        event!("β_roundtrip", β_roundtrip)
+    #     # Compute the oracle confidence using the regularized incomplete beta function.
+    #     k = compression
+    #     l = samples - k
+    #     β_roundtrip = ϵ * samples * (ScenarioTheory.betainc(k, l + 1, ϵ) - ScenarioTheory.betainc(k + 1, l, ϵ)) / (1.0 - ScenarioTheory.betainc(l, k + 1, 1.0 - ϵ))
+    #     event!("β_roundtrip", β_roundtrip)
 
-        # Check that given a β, we chose an ϵ such that the true violation is at most that much.
-        # This corresponds to a higher confidence 1 - β, or β >= β_roundtrip.
-        β >= β_roundtrip
-    end
+    #     # Check that given a β, we chose an ϵ such that the true violation is at most that much.
+    #     # This corresponds to a higher confidence 1 - β, or β >= β_roundtrip.
+    #     β >= β_roundtrip
+    # end
 end

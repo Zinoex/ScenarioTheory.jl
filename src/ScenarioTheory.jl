@@ -11,7 +11,7 @@ include("onetail.jl")
 export CompressionOneTail
 
 include("twotail.jl")
-export CompressionTwoTail
+# export CompressionTwoTail
 
 include("scenario_opt.jl")
 export ScenarioOptimization

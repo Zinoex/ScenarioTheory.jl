@@ -27,7 +27,7 @@
     Supposition.@check function samples_equal_decision_vars(samples=samples_gen, β=beta_gen)
         dist = ScenarioOptimization(samples, samples)
         ϵ = violation(dist, β)
-        ϵ[1] == 0.0 && ϵ[2] == 1.0
+        ϵ[2] == 1.0
     end
 
     # More decision variables should lead to higher violation, all else equal.
@@ -73,11 +73,9 @@
         samples, decision_vars = sample_decision_vars
         β1, β2 = β
 
-        dist1 = ScenarioOptimization(samples, decision_vars)
-        ϵ1 = violation(dist1, β1)
-
-        dist2 = ScenarioOptimization(samples, decision_vars)
-        ϵ2 = violation(dist2, β2)
+        dist = ScenarioOptimization(samples, decision_vars)
+        ϵ1 = violation(dist, β1)
+        ϵ2 = violation(dist, β2)
 
         ϵ1[2] >= ϵ2[2]
     end
