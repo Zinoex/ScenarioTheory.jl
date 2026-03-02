@@ -43,9 +43,6 @@
         
         dist2 = WaitAndJudgeScenarioOptimization(samples, support + 1)
         ϵ2 = violation(dist2, β)
-
-    #     sample_support::Pair{Int64, Int64} = 9403512 => 3509701
-    #   β::Float16 = Float16(1.0)
         
         ϵ1[2] <= ϵ2[2]
     end
@@ -91,7 +88,7 @@
         dist = WaitAndJudgeScenarioOptimization(samples, support)
         ϵ = violation(dist, β)[2]
 
-        β_roundtrip = ϵ * (samples + 1) * (ScenarioTheory.betainc(support, samples - support + 1, ϵ) - ScenarioTheory.betainc(support + 1, samples - support, ϵ)) / ScenarioTheory.betainc(support + 1, samples - support + 1, ϵ)
+        β_roundtrip = ϵ * (samples + 1) * (ScenarioTheory.betainc(support, samples - support + 1, ϵ) - ScenarioTheory.betainc(support + 1, samples - support, ϵ)) / (1.0 - ScenarioTheory.betainc(samples - support + 1, support + 1, 1.0 - ϵ))
 
         event!("β_roundtrip", β_roundtrip)
 

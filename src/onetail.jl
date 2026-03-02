@@ -1,8 +1,8 @@
-struct CompresionOneTail <: AbstractScenarioProblem
+struct CompressionOneTail <: AbstractScenarioProblem
     samples::Int
     compressed::Int
 
-    function CompresionOneTail(samples::Int, compressed::Int)
+    function CompressionOneTail(samples::Int, compressed::Int)
         if samples < 1
             throw(DomainError(samples, "expected N ≥ 1"))
         end
@@ -19,7 +19,7 @@ struct CompresionOneTail <: AbstractScenarioProblem
     end
 end
 
-function psi(dist::CompresionOneTail, β::Real, α::Real)
+function psi(dist::CompressionOneTail, β::Real, α::Real)
     # $$ \Psi_{k,\delta}(\alpha) = \frac{\delta}{N}\sum_{m=k}^{N-1} \frac{\binom{m}{k}}{\binom{N}{k}} (1-\alpha)^{-(N-m)} $$
     k = dist.compressed
     N = dist.samples
@@ -47,7 +47,7 @@ function psi(dist::CompresionOneTail, β::Real, α::Real)
     return βT / T(N) * coeff * ratio
 end
 
-function violation(dist::CompresionOneTail, β::Real; tol=1e-10)
+function violation(dist::CompressionOneTail, β::Real; tol=1e-10)
     N = dist.samples
     k = dist.compressed
     l = N - k
@@ -60,7 +60,7 @@ function violation(dist::CompresionOneTail, β::Real; tol=1e-10)
         while α_upper - α_lower > tol
             α = (α_lower + α_upper) / 2
 
-            left = β * betainc(k + 1, l, α)
+            left = β * (1.0 - betainc(l, k + 1, 1.0 - α))
             right = α * N * (betainc(k, l + 1, α) - betainc(k + 1, l, α))
             
             if left > right

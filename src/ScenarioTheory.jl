@@ -8,7 +8,7 @@ abstract type AbstractScenarioProblem end
 export violation
 
 include("onetail.jl")
-export CompresionOneTail
+export CompressionOneTail
 
 include("twotail.jl")
 export CompressionTwoTail
