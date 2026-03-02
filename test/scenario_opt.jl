@@ -90,10 +90,12 @@
 
         # Compute the oracle confidence using the regularized incomplete beta function.
         k = decision_vars - 1
-        β_oracle = ScenarioTheory.betainc(samples - k, k + 1, 1 - ϵ)
+        β_roundtrip = ScenarioTheory.betainc(samples - k, k + 1, 1 - ϵ)
 
-        # Check that given a β, we chose an ϵ such that the true violation is at most this much.
-        # This corresponds to a smaller β_oracle, since the violation is a decreasing function of β.
-        β >= β_oracle
+        event!("β_roundtrip", β_roundtrip)
+
+        # Check that given a β, we chose an ϵ such that the true violation is at most that much.
+        # This corresponds to a higher confidence 1 - β, or β >= β_roundtrip.
+        β >= β_roundtrip
     end
 end

@@ -24,7 +24,7 @@ function violation(dist::WaitAndJudgeScenarioOptimization, β::Real; tol=1e-10)
     k = dist.support
     l = N - k
 
-    if N == d
+    if N == k
         ϵ = 1.0
     else
         α_lower = 0.0
@@ -42,8 +42,8 @@ function violation(dist::WaitAndJudgeScenarioOptimization, β::Real; tol=1e-10)
 
             # \beta (1 - \sum_{i=0}^k \binom{N + 1}{i}\alpha^{i}(1-\alpha)^{N + 1 - i} = \alpha * (N + 1) * \binom{N}{k}\alpha^k(1-\alpha)^{N - k}
 
-            left = β * betainc(k + 1, l + 1, α)
-            right = α * (N + 1) * (betainc(k, l + 1, α) - betainc(k + 1, l, α))
+            left = β * (1.0 - betainc(l + 1, k + 1, 1.0 - α))
+            right = α * (N + 1) * (betainc(k, N - k + 1, α) - betainc(k + 1, N - k, α))
             
             if left > right
                 α_upper = α
