@@ -1,4 +1,11 @@
 @testset "Compression One-tail" begin
+    @testset "Errors" begin
+        @test_throws DomainError CompressionOneTail(0, 0)
+        @test_throws ArgumentError CompressionOneTail(10, 11)
+        @test_throws DomainError CompressionOneTail(-1, 0)
+        @test_throws DomainError CompressionOneTail(10, -1)
+    end
+
     # 10M samples should be good enough for testing purposes, but we can go higher if needed.
     samples_gen = Data.Integers(1, 10_000_000)
     compression_gen = Data.Integers(1, 10_000_000)

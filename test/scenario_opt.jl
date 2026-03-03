@@ -1,4 +1,11 @@
 @testset "Scenario Optimization" begin
+    @testset "Errors" begin
+        @test_throws DomainError ScenarioOptimization(0, 0)
+        @test_throws ArgumentError ScenarioOptimization(10, 11)
+        @test_throws DomainError ScenarioOptimization(-1, 0)
+        @test_throws DomainError ScenarioOptimization(10, -1)
+    end
+
     # 10M samples should be good enough for testing purposes, but we can go higher if needed.
     samples_gen = Data.Integers(1, 10_000_000)
     decision_vars_gen = Data.Integers(1, 10_000_000)

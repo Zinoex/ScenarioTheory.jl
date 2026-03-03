@@ -1,4 +1,11 @@
 @testset "Wait-and-judge Scenario Optimization" begin
+    @testset "Errors" begin
+        @test_throws DomainError WaitAndJudgeScenarioOptimization(0, 0)
+        @test_throws ArgumentError WaitAndJudgeScenarioOptimization(10, 11)
+        @test_throws DomainError WaitAndJudgeScenarioOptimization(-1, 0)
+        @test_throws DomainError WaitAndJudgeScenarioOptimization(10, -1)
+    end
+
     # 10M samples should be good enough for testing purposes, but we can go higher if needed.
     samples_gen = Data.Integers(1, 10_000_000)
     support_gen = Data.Integers(1, 10_000_000)
