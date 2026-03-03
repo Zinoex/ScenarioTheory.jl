@@ -38,19 +38,18 @@ theory = ScenarioOptimization(samples, decision_variables)
 
 ### Scenario optimization
 
-This theory is the original based around convex optimization with chance-constraints [1]. That is, define the violation probability $V(x) = \bbP[\delta \in \Delta : x \notin X_\delta]$ where $\delta$ is a random variable with support $\Delta$ and $X_\delta$ is a convex set conditional on $\delta$. Then, the corresponding chance-constraint can be formulated as $V(x) < \epsilon$.
-Now, assume a given dataset $D = \{\delta^1, \ldots, \delta^N\}$ of size $N$ sampled according to $\bbP^N$ and let
+This theory is the original based around convex optimization with chance-constraints [1]. That is, define the violation probability $V(x) = P[\delta \in \Delta : x \notin X_\delta]$ where $\delta$ is a random variable with support $\Delta$ and $X_\delta$ is a convex set conditional on $\delta$. Then, the corresponding chance-constraint can be formulated as $V(x) < \epsilon$.
+Now, assume a given dataset $D = \{\delta^1, \ldots, \delta^N\}$ of size $N$ sampled according to $P^N$ and let
 ```math
     \begin{aligned}
         x^*(D) := \mathop{arg\,min}_{x \in \bbR^d} & f(x)
                 & x \in X_{\delta^i}, \quad i = 1, \ldots, N.
     \end{aligned}
 ```
-Then, $\bbP^N[V(x^*(D)) < \epsilon] \geq 1 - \beta$ where $\beta$ is a function of $N$ and $d$. For a more in-depth explanation, please refer to [1].
+Then, $P^N[V(x^*(D)) < \epsilon] \geq 1 - \beta$ where $\beta$ is a function of $N$ and $d$. For a more in-depth explanation, please refer to [1].
 
-!!! warning
-
-    The theory requires that almost surely the problem is feasible and the solution is unique. This is not checked by this code (it does not have access to the distribution nor the optimization problem); it is your responsibility to check that. 
+> [!WARNING]
+> The theory requires that almost surely the problem is feasible and the solution is unique. This is not checked by this code (it does not have access to the distribution nor the optimization problem); it is your responsibility to check that. 
 
 To compute $\epsilon$ given $N$, $d$, and $\beta$, run the following:
 ```julia
@@ -70,11 +69,10 @@ theory = ScenarioOptimization(samples, decision_variables)
 ### Wait-and-judge scenario optimization
 
 This theory is similar to vanilla scenario optimization except that, rather than relying on the number of decision variables, it relies on the number of support constraints (from $D$) [3]. A constraint is a support constraint if removing it changes the optimal value $f(x^*(D))$. Let the number of support constraints be $k$.
-Then, $\bbP^N[V(x^*(D)) < \epsilon] \geq 1 - \beta$ where $\beta$ is a function of $N$ and $k$. For a more in-depth explanation, please refer to [3].
+Then, $P^N[V(x^*(D)) < \epsilon] \geq 1 - \beta$ where $\beta$ is a function of $N$ and $k$. For a more in-depth explanation, please refer to [3].
 
-!!! warning
-
-    The theory requires that almost surely the problem is feasible, the solution is unique, and the solution with only the support constraints coincides with the solution with all constraints (non-degeneracy). This is not checked by this code (it does not have access to the distribution nor the optimization problem); it is your responsibility to check that. 
+> [!WARNING]
+> The theory requires that almost surely the problem is feasible, the solution is unique, and the solution with only the support constraints coincides with the solution with all constraints (non-degeneracy). This is not checked by this code (it does not have access to the distribution nor the optimization problem); it is your responsibility to check that. 
 
 To compute $\epsilon$ given $N$, $d$, and $\beta$, run the following:
 ```julia
@@ -93,11 +91,10 @@ theory = WaitAndJudgeScenarioOptimization(samples, support_constraints)
 
 ### One-tail change of compression
 
-This theory is a modern reformulation and generalization in terms of compression. To this end, let $D$ be a multi-set sampled according to $\bbP^N$ and assume a given compression function $c$ such that $c(D) \subset D$ for all $D$. The change of compression is defined as $\phi(D) = \bbP[c(c(D), \delta) != c(D) | D]$. Let $k$ be cardinality of $D$. Then, $\bbP^N[\phi(D) < \epsilon] \geq 1 - \beta$ where $\epsilon$ is a function of $N$, $k$, and $\beta$. For a more in-depth explanation, please refer to [3].
+This theory is a modern reformulation and generalization in terms of compression. To this end, let $D$ be a multi-set sampled according to $P^N$ and assume a given compression function $c$ such that $c(D) \subset D$ for all $D$. The change of compression is defined as $\phi(D) = P[c(c(D), \delta) != c(D) | D]$. Let $k$ be cardinality of $D$. Then, $P^N[\phi(D) < \epsilon] \geq 1 - \beta$ where $\epsilon$ is a function of $N$, $k$, and $\beta$. For a more in-depth explanation, please refer to [3].
 
-!!! warning
-
-    The theory requires that compression function satisfies a preference property (see [3]). This is not checked by this code (it does not have access to the compression function); it is your responsibility to check that. 
+> [!WARNING]
+> The theory requires that compression function satisfies a preference property (see [3]). This is not checked by this code (it does not have access to the compression function); it is your responsibility to check that. 
 
 To compute $\epsilon$ given $N$, $d$, and $\beta$, run the following:
 ```julia
@@ -118,11 +115,10 @@ theory = CompressionOneTail(samples, compression)
 
 This theory is an extension to no only upper but also lower bounds on the violation probability.
 
-Then, $\bbP^N[\underline{\epsilon} < \phi(D) < \overline{\epsilon}] \geq 1 - \beta$ where $\underline{\epsilon}$ and $\overline{\epsilon}$ are functions of $N$, $k$, and $\beta$. For a more in-depth explanation, please refer to [3].
+Then, $P^N[\underline{\epsilon} < \phi(D) < \overline{\epsilon}] \geq 1 - \beta$ where $\underline{\epsilon}$ and $\overline{\epsilon}$ are functions of $N$, $k$, and $\beta$. For a more in-depth explanation, please refer to [3].
 
-!!! warning
-
-    The theory requires that compression function satisfies a preference property, the distribution has no concentrated mass, and the compression function is almost surely non-associative (see [3]). This is not checked by this code (it does not have access to the distribution nor the compression function); it is your responsibility to check that. 
+> [!WARNING]
+> The theory requires that compression function satisfies a preference property, the distribution has no concentrated mass, and the compression function is almost surely non-associative (see [3]). This is not checked by this code (it does not have access to the distribution nor the compression function); it is your responsibility to check that. 
 
 To compute $\epsilon$ given $N$, $d$, and $\beta$, run the following:
 ```julia
