@@ -22,7 +22,8 @@ end
 function violation(dist::CompressionTwoTail, β::Real; tol=1e-10)
     N = dist.samples
     k = dist.compressed
-    l = N - k
+
+    epps = eps(Float64)
 
     α_lower = 0
     α_upper = k / N
@@ -30,7 +31,7 @@ function violation(dist::CompressionTwoTail, β::Real; tol=1e-10)
         α = (α_lower + α_upper) / 2
         left = (β / 3) * binomccdf(N, α, k) + (β / 6) * binomccdf(4 * N + 1 - k, α, k)
         right = (1 + β / (6 * N)) * α * N * binompdf(N, α, k)
-        if left > right
+        if left > right + epps
             α_lower = α
         else
             α_upper = α
@@ -38,7 +39,7 @@ function violation(dist::CompressionTwoTail, β::Real; tol=1e-10)
     end
     ϵ_lower = α_lower
     
-    if l == 0
+    if N == k
         ϵ_upper = 1.0
     else
         α_lower = k / N
@@ -47,7 +48,7 @@ function violation(dist::CompressionTwoTail, β::Real; tol=1e-10)
             α = (α_lower + α_upper) / 2
             left = (β / 3) * binomccdf(N, α, k) + (β / 6) * binomccdf(4 * N + 1 - k, α, k)
             right = (1 + β / (6 * N)) * α * N * binompdf(N, α, k)
-            if left > right
+            if left > right + epps
                 α_upper = α
             else
                 α_lower = α

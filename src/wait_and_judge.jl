@@ -22,7 +22,8 @@ end
 function violation(dist::WaitAndJudgeScenarioOptimization, β::Real; tol=1e-10)
     N = dist.samples
     k = dist.support
-    l = N - k
+
+    epps = eps(Float64)
 
     if N == k
         ϵ = 1.0
@@ -45,7 +46,7 @@ function violation(dist::WaitAndJudgeScenarioOptimization, β::Real; tol=1e-10)
             left = β * binomccdf(N + 1, α, k)
             right = α * (N + 1) * binompdf(N, α, k)
             
-            if left > right
+            if left > right + epps
                 α_upper = α
             else
                 α_lower = α

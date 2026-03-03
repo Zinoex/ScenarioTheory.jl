@@ -104,6 +104,11 @@
         dist = CompressionTwoTail(samples, compression)
         ϵ = violation(dist, β)
 
+        # This will result in NaN β_roundtrip since divisor is zero, but it will only happen if samples == compression == 1.
+        if ϵ[1] == 0.0
+            reject!()
+        end
+
         N = samples
         k = compression
 
