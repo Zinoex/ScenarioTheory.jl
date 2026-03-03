@@ -1,4 +1,4 @@
-struct ScenarioOptimization <: AbstractScenarioProblem
+struct ScenarioOptimization <: AbstractScenarioTheory
     samples::Int
     decision_vars::Int
 

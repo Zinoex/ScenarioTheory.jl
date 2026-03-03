@@ -1,4 +1,4 @@
-struct WaitAndJudgeScenarioOptimization <: AbstractScenarioProblem
+struct WaitAndJudgeScenarioOptimization <: AbstractScenarioTheory
     samples::Int
     support::Int
 

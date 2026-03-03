@@ -1,4 +1,4 @@
-struct SampleDiscarding <: AbstractScenarioProblem
+struct SampleDiscarding <: AbstractScenarioTheory
     samples::Int
     decision_vars::Int
     discarded::Int

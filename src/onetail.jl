@@ -1,4 +1,4 @@
-struct CompressionOneTail <: AbstractScenarioProblem
+struct CompressionOneTail <: AbstractScenarioTheory
     samples::Int
     compressed::Int
 

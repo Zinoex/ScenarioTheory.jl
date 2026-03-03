@@ -2,7 +2,7 @@ module ScenarioTheory
 
 using StatsFuns: binompdf, binomcdf, binomccdf
 
-abstract type AbstractScenarioProblem end
+abstract type AbstractScenarioTheory end
 
 export violation
 
@@ -18,7 +18,7 @@ export ScenarioOptimization
 include("wait_and_judge.jl")
 export WaitAndJudgeScenarioOptimization
 
-include("sample_discarding.jl")
-export SampleDiscardingScenarioOptimization
+# include("sample_discarding.jl")
+# export SampleDiscardingScenarioOptimization
 
 end
