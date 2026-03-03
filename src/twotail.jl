@@ -1,31 +1,28 @@
-struct TwoTailViolation <: AbstractViolation
-    k::Int
-    N::Int
+struct CompressionTwoTail <: AbstractScenarioProblem
+    samples::Int
+    compressed::Int
 
-    function TwoTailViolation(k::Int, N::Int)
-        if N < 1
-            throw(DomainError(N, "expected N ≥ 1"))
+    function CompressionTwoTail(samples::Int, compressed::Int)
+        if samples < 1
+            throw(DomainError(samples, "expected samples ≥ 1"))
         end
 
-        if k < 0
-            throw(DomainError(k, "expected k ≥ 0"))
+        if compressed < 0
+            throw(DomainError(compressed, "expected compressed ≥ 0"))
         end
         
-        if k > N
-            throw(ArgumentError("expected k ≤ N"))
+        if compressed > samples
+            throw(ArgumentError("expected compressed ≤ samples"))
         end
         
-        return new(k, N)
+        return new(samples, compressed)
     end
 end
 
-numfailure(dist::TwoTailViolation) = dist.k
-numscenarios(dist::TwoTailViolation) = dist.N
-
-function psi(dist::TwoTailViolation, β::Real, α::Real)
+function psi(dist::CompressionTwoTail, β::Real, α::Real)
     # $$ \tilde{\Psi}_{k,\delta}(\alpha) = \frac{\delta}{2N} \sum_{m=k}^{N-1} \frac{{m \choose k}}{{N \choose k}} (1-\alpha)^{-(N-m)} + \frac{\delta}{6N} \sum_{m=N+1}^{4N} \frac{{m \choose k}}{{N \choose k}} (1-\alpha)^{m-N} $$
-    k = dist.k
-    N = dist.N
+    N = dist.samples
+    k = dist.compressed
 
     if α < 0 || α > 1
         throw(DomainError(α, "expected α ∈ (0, 1)"))
@@ -52,13 +49,17 @@ function psi(dist::TwoTailViolation, β::Real, α::Real)
     return βT / T(N) * coeff * (ratio1 / 2 + ratio2 / 6)
 end
 
-function violation(dist::TwoTailViolation, β::Real; tol=1e-10)
+function violation(dist::CompressionTwoTail, β::Real; tol=1e-10)
+    N = dist.samples
+    k = dist.compressed
+    l = N - k
+
     α_lower = 0
-    α_upper = numfailure(dist) / numscenarios(dist)
+    α_upper = k / N
     while α_upper - α_lower > tol
         α = (α_lower + α_upper) / 2
-        left = β / 3 * betainc(numfailure(dist) + 1, numsuccess(dist), α) + β / 6 * betainc(numfailure(dist) + 1, 4 * numscenarios(dist) + 1 - numfailure(dist), α)
-        right = (1 + β / (6 * numscenarios(dist))) * α * numscenarios(dist) * (betainc(numfailure(dist), numsuccess(dist) + 1, α) - betainc(numfailure(dist) + 1, numsuccess(dist), α))
+        left = β / 3 * betainc(k + 1, l, α) + β / 6 * betainc(k + 1, 4 * N + 1 - k, α)
+        right = (1 + β / (6 * N)) * α * N * (betainc(k, l + 1, α) - betainc(k + 1, l, α))
         if left > right
             α_upper = α
         else
@@ -67,15 +68,15 @@ function violation(dist::TwoTailViolation, β::Real; tol=1e-10)
     end
     ϵ_lower = α_lower
     
-    if numsuccess(dist) == 0
+    if l == 0
         ϵ_upper = 1
     else
-        α_lower = numfailure(dist) / numscenarios(dist)
+        α_lower = k / N
         α_upper = 1
         while α_upper - α_lower > tol
             α = (α_lower + α_upper) / 2
-            left = (β / 2 - β / 6) * betainc(numfailure(dist) + 1, numsuccess(dist), α) + β / 6 * betainc(numfailure(dist) + 1, 4 * numscenarios(dist) + 1 - numfailure(dist), α)
-            right = (1 + β / (6 * numscenarios(dist))) * α * numscenarios(dist) * (betainc(numfailure(dist), numsuccess(dist) + 1, α) - betainc(numfailure(dist) + 1, numsuccess(dist), α))
+            left = (β / 2 - β / 6) * betainc(k + 1, l, α) + β / 6 * betainc(k + 1, 4 * N + 1 - k, α)
+            right = (1 + β / (6 * N)) * α * N * (betainc(k, l + 1, α) - betainc(k + 1, l, α))
             if left > right
                 α_upper = α
             else
@@ -86,8 +87,4 @@ function violation(dist::TwoTailViolation, β::Real; tol=1e-10)
     end
     
     return ϵ_lower, ϵ_upper
-end
-
-function confidence(dist::TwoTailViolation, ϵ::Tuple{<:Real, <:Real}; tol=1e-10)
-    throw(ArgumentError("confidence is not implemented for TwoTailViolation"))
 end

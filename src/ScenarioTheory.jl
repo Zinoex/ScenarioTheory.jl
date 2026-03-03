@@ -3,15 +3,23 @@ module ScenarioTheory
 using SpecialFunctions: beta_inc
 betainc(a, b, x) = first(beta_inc(a, b, x))
 
-abstract type AbstractViolation end
-numsuccess(dist::AbstractViolation) = numscenarios(dist) - numfailure(dist)
+abstract type AbstractScenarioProblem end
 
-export psi, violation, confidence
+export violation
 
 include("onetail.jl")
-export OneTailViolation
+export CompressionOneTail
 
 include("twotail.jl")
-export TwoTailViolation
+# export CompressionTwoTail
+
+include("scenario_opt.jl")
+export ScenarioOptimization
+
+include("wait_and_judge.jl")
+export WaitAndJudgeScenarioOptimization
+
+include("sample_discarding.jl")
+export SampleDiscardingScenarioOptimization
 
 end
