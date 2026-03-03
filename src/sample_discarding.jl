@@ -38,7 +38,7 @@ function violation(dist::SampleDiscarding, β::Real; tol=1e-10)
 
         while α_upper - α_lower > tol
             α = (α_lower + α_upper) / 2
-            β_mid = binomial(r, k) * betainc(N - r, r + 1, 1 - α)
+            β_mid = binomial(r, k) * binomcdf(N, r, α)
 
             if β_mid > β
                 α_upper = α

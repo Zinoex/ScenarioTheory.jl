@@ -1,7 +1,6 @@
 module ScenarioTheory
 
-using SpecialFunctions: beta_inc
-betainc(a, b, x) = first(beta_inc(a, b, x))
+using StatsFuns: binompdf, binomcdf, binomccdf
 
 abstract type AbstractScenarioProblem end
 
@@ -11,7 +10,7 @@ include("onetail.jl")
 export CompressionOneTail
 
 include("twotail.jl")
-# export CompressionTwoTail
+export CompressionTwoTail
 
 include("scenario_opt.jl")
 export ScenarioOptimization

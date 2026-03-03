@@ -22,7 +22,7 @@ end
 function violation(dist::ScenarioOptimization, β::Real; tol=1e-10)
     N = dist.samples
     d = dist.decision_vars
-    r = d - 1
+    k = d - 1
 
     if N == d
         ϵ = 1.0
@@ -32,7 +32,7 @@ function violation(dist::ScenarioOptimization, β::Real; tol=1e-10)
 
         while α_upper - α_lower > tol
             α = (α_lower + α_upper) / 2
-            β_mid = betainc(N - r, r + 1, 1 - α)
+            β_mid = binomcdf(N, α, k)
 
             if β_mid < β
                 α_upper = α

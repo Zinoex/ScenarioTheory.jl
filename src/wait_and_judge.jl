@@ -42,8 +42,8 @@ function violation(dist::WaitAndJudgeScenarioOptimization, β::Real; tol=1e-10)
 
             # \beta (1 - \sum_{i=0}^k \binom{N + 1}{i}\alpha^{i}(1-\alpha)^{N + 1 - i} = \alpha * (N + 1) * \binom{N}{k}\alpha^k(1-\alpha)^{N - k}
 
-            left = β * (1.0 - betainc(l + 1, k + 1, 1.0 - α))
-            right = α * (N + 1) * (betainc(k, N - k + 1, α) - betainc(k + 1, N - k, α))
+            left = β * binomccdf(N + 1, α, k)
+            right = α * (N + 1) * binompdf(N, α, k)
             
             if left > right
                 α_upper = α

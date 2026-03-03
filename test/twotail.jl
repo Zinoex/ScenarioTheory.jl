@@ -7,7 +7,7 @@
 
     # Beta in (0, 1], but the exponents of beta are more interesting, so we generate logβ in (-15, 0]
     #  and then exponentiate.
-    beta_gen = map(Data.Floats(;minimum=-15.0, maximum=0.0, nans=false, infs=false)) do logβ
+    beta_gen = map(Data.Floats{Float64}(;minimum=-15.0, maximum=0.0, nans=false, infs=false)) do logβ
         return exp(logβ)
     end
 
@@ -95,25 +95,42 @@
         event!("ϵ1", ϵ1)
         event!("ϵ2", ϵ2)
 
-        # Should I expect ϵ1[1] <= ϵ2[1] or ϵ1[1] >= ϵ2[1] for higher β?
-
-        ϵ1[1] >= ϵ2[1] && ϵ1[2] >= ϵ2[2]
+        ϵ1[1] <= ϵ2[1] && ϵ2[2] <= ϵ1[2]
     end
 
-    # Soundness: the true violation should be at most ϵ with confidence at least β.
-    # Supposition.@check function violation_soundness(sample_compression=sc_gen, β=beta_gen)
-    #     samples, compression = sample_compression
-    #     dist = CompressionTwoTail(samples, compression)
-    #     ϵ = violation(dist, β)[2]
+    # Soundness: the true violation should fall between ϵ with confidence at least β.
+    Supposition.@check function violation_lower_soundness(sample_compression=sc_gen, β=beta_gen)
+        samples, compression = sample_compression
+        dist = CompressionTwoTail(samples, compression)
+        ϵ = violation(dist, β)
 
-    #     # Compute the oracle confidence using the regularized incomplete beta function.
-    #     k = compression
-    #     l = samples - k
-    #     β_roundtrip = ϵ * samples * (ScenarioTheory.betainc(k, l + 1, ϵ) - ScenarioTheory.betainc(k + 1, l, ϵ)) / (1.0 - ScenarioTheory.betainc(l, k + 1, 1.0 - ϵ))
-    #     event!("β_roundtrip", β_roundtrip)
+        N = samples
+        k = compression
 
-    #     # Check that given a β, we chose an ϵ such that the true violation is at most that much.
-    #     # This corresponds to a higher confidence 1 - β, or β >= β_roundtrip.
-    #     β >= β_roundtrip
-    # end
+        # Compute the roundtrip confidence using the regularized incomplete beta function.
+        β_lower_roundtrip = ϵ[1] * N * binompdf(N, ϵ[1], k) / (binomccdf(N, ϵ[1], k) / 3 + binomccdf(4 * N + 1 - k, ϵ[1], k) / 6 + ϵ[1] * N * binompdf(N, ϵ[1], k) / (6 * N))
+        event!("β_lower_roundtrip", β_lower_roundtrip)
+
+        # Check that given a β, we chose an ϵ such that the true violation is at most that much.
+        # This corresponds to a higher confidence 1 - β, or β >= β_lower_roundtrip.
+        β >= β_lower_roundtrip
+    end
+
+    # Soundness: the true violation should fall between ϵ with confidence at least β.
+    Supposition.@check function violation_upper_soundness(sample_compression=sc_gen, β=beta_gen)
+        samples, compression = sample_compression
+        dist = CompressionTwoTail(samples, compression)
+        ϵ = violation(dist, β)
+
+        N = samples
+        k = compression
+
+        # Compute the roundtrip confidence using the regularized incomplete beta function.
+        β_upper_roundtrip = ϵ[2] * N * binompdf(N, ϵ[2], k) / (binomccdf(N, ϵ[2], k) / 3 + binomccdf(4 * N + 1 - k, ϵ[2], k) / 6 + ϵ[2] * N * binompdf(N, ϵ[2], k) / (6 * N))
+        event!("β_upper_roundtrip", β_upper_roundtrip)
+
+        # Check that given a β, we chose an ϵ such that the true violation is at most that much.
+        # This corresponds to a higher confidence 1 - β, or β >= β_upper_roundtrip.
+        β >= β_upper_roundtrip
+    end
 end

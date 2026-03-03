@@ -1,7 +1,10 @@
+# VS Code settings
+.vscode/
+
+# Julia
 *.jl.*.cov
 *.jl.cov
 *.jl.mem
 /Manifest*.toml
-/docs/Manifest*.toml
-/docs/build/
 /examples/Manifest*.toml
+/test/Manifest*.toml

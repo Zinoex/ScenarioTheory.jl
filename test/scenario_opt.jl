@@ -7,7 +7,7 @@
 
     # Beta in (0, 1], but the exponents of beta are more interesting, so we generate logβ in (-15, 0]
     #  and then exponentiate.
-    beta_gen = map(Data.Floats(;minimum=-15.0, maximum=0.0, nans=false, infs=false)) do logβ
+    beta_gen = map(Data.Floats{Float64}(;minimum=-15.0, maximum=0.0, nans=false, infs=false)) do logβ
         return exp(logβ)
     end
 
@@ -86,11 +86,11 @@
         dist = ScenarioOptimization(samples, decision_vars)
         ϵ = violation(dist, β)[2]
 
-        # Compute the oracle confidence using the regularized incomplete beta function.
+        N = samples
         k = decision_vars - 1
-        β_roundtrip = ScenarioTheory.betainc(samples - k, k + 1, 1 - ϵ)
 
-        event!("β_roundtrip", β_roundtrip)
+        # Compute the roundtrip confidence using the regularized incomplete beta function.
+        β_roundtrip = binomcdf(N, ϵ, k)
 
         # Check that given a β, we chose an ϵ such that the true violation is at most that much.
         # This corresponds to a higher confidence 1 - β, or β >= β_roundtrip.

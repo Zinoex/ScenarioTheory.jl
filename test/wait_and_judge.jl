@@ -7,7 +7,7 @@
 
     # Beta in (0, 1], but the exponents of beta are more interesting, so we generate logβ in (-15, 0]
     #  and then exponentiate.
-    beta_gen = map(Data.Floats(;minimum=-15.0, maximum=0.0, nans=false, infs=false)) do logβ
+    beta_gen = map(Data.Floats{Float64}(;minimum=-15.0, maximum=0.0, nans=false, infs=false)) do logβ
         return exp(logβ)
     end
 
@@ -86,9 +86,11 @@
         dist = WaitAndJudgeScenarioOptimization(samples, support)
         ϵ = violation(dist, β)[2]
 
-        β_roundtrip = ϵ * (samples + 1) * (ScenarioTheory.betainc(support, samples - support + 1, ϵ) - ScenarioTheory.betainc(support + 1, samples - support, ϵ)) / (1.0 - ScenarioTheory.betainc(samples - support + 1, support + 1, 1.0 - ϵ))
+        N = samples
+        k = support
 
-        event!("β_roundtrip", β_roundtrip)
+        # Compute the roundtrip confidence using the regularized incomplete beta function.
+        β_roundtrip = ϵ * (N + 1) * binompdf(N, ϵ, k) / binomccdf(N + 1, ϵ, k)
 
         # Check that given a β, we chose an ϵ such that the true violation is at most that much.
         # This corresponds to a higher confidence 1 - β, or β >= β_roundtrip.
