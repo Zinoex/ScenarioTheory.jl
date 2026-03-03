@@ -1,6 +1,6 @@
 name = "ScenarioTheory"
 uuid = "34245d11-8d86-4cc3-9865-ee17c37bff99"
-version = "1.0.0-DEV"
+version = "0.1.0"
 authors = ["Frederik Baymler Mathiesen <frederik@baymler.com> and contributors"]
 
 [deps]
