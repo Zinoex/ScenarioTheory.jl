@@ -23,10 +23,13 @@
         return compression <= samples
     end
 
-    Supposition.@check function scenario_opt(sample_compression=sc_gen, β=beta_gen)
+    Supposition.@check function violation_ranges(sample_compression=sc_gen, β=beta_gen)
         samples, compression = sample_compression
         dist = CompressionOneTail(samples, compression)
         ϵ = violation(dist, β)
+
+        event!("ϵ", ϵ)
+
         ϵ[1] == 0.0 && 0.0 <= ϵ[2] <= 1.0
     end
 
@@ -34,6 +37,9 @@
     Supposition.@check function samples_equal_compression(samples=samples_gen, β=beta_gen)
         dist = CompressionOneTail(samples, samples)
         ϵ = violation(dist, β)
+
+        event!("ϵ", ϵ)
+
         ϵ[2] == 1.0
     end
 
@@ -50,6 +56,9 @@
         
         dist2 = CompressionOneTail(samples, compression + 1)
         ϵ2 = violation(dist2, β)
+
+        event!("ϵ1", ϵ1)
+        event!("ϵ2", ϵ2)
         
         ϵ1[2] <= ϵ2[2]
     end
@@ -68,6 +77,9 @@
         dist2 = CompressionOneTail(samples + 1, compression)
         ϵ2 = violation(dist2, β)
 
+        event!("ϵ1", ϵ1)
+        event!("ϵ2", ϵ2)
+
         ϵ1[2] >= ϵ2[2]
     end
 
@@ -84,6 +96,9 @@
         ϵ1 = violation(dist, β1)
         ϵ2 = violation(dist, β2)
 
+        event!("ϵ1", ϵ1)
+        event!("ϵ2", ϵ2)
+
         ϵ1[2] >= ϵ2[2]
     end
 
@@ -93,11 +108,14 @@
         dist = CompressionOneTail(samples, compression)
         ϵ = violation(dist, β)[2]
 
+        event!("ϵ", ϵ)
+
         N = samples
         k = compression
 
         # Compute the roundtrip confidence using the regularized incomplete beta function.
         β_roundtrip = ϵ * N * binompdf(N, ϵ, k) / binomccdf(N, ϵ, k)
+        event!("β_roundtrip", β_roundtrip)
 
         # Check that given a β, we chose an ϵ such that the true violation is at most that much.
         # This corresponds to a higher confidence 1 - β, or β >= β_roundtrip.

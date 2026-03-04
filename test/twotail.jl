@@ -23,10 +23,13 @@
         return compression <= samples
     end
 
-    Supposition.@check function scenario_opt(sample_compression=sc_gen, β=beta_gen)
+    Supposition.@check function violation_ranges(sample_compression=sc_gen, β=beta_gen)
         samples, compression = sample_compression
         dist = CompressionTwoTail(samples, compression)
         ϵ = violation(dist, β)
+
+        event!("ϵ", ϵ)
+
         0.0 <= ϵ[1] <= 1.0 && 0.0 <= ϵ[2] <= 1.0 && ϵ[1] <= ϵ[2]
     end
 
@@ -40,6 +43,9 @@
         dist_two_tail = CompressionTwoTail(samples, compression)
         ϵ_two_tail = violation(dist_two_tail, β)
 
+        event!("ϵ_one_tail", ϵ_one_tail)
+        event!("ϵ_two_tail", ϵ_two_tail)
+
         ϵ_one_tail[2] <= ϵ_two_tail[2]
     end
 
@@ -47,6 +53,9 @@
     Supposition.@check function samples_equal_compression(samples=samples_gen, β=beta_gen)
         dist = CompressionTwoTail(samples, samples)
         ϵ = violation(dist, β)
+
+        event!("ϵ", ϵ)
+    
         ϵ[2] == 1.0
     end
 
@@ -63,6 +72,9 @@
         
         dist2 = CompressionTwoTail(samples, compression + 1)
         ϵ2 = violation(dist2, β)
+
+        event!("ϵ1", ϵ1)
+        event!("ϵ2", ϵ2)
         
         ϵ1[1] <= ϵ2[1] && ϵ1[2] <= ϵ2[2]
     end
@@ -80,6 +92,9 @@
 
         dist2 = CompressionTwoTail(samples + 1, compression)
         ϵ2 = violation(dist2, β)
+
+        event!("ϵ1", ϵ1)
+        event!("ϵ2", ϵ2)
 
         ϵ1[1] >= ϵ2[1] && ϵ1[2] >= ϵ2[2]
     end
@@ -111,6 +126,8 @@
         dist = CompressionTwoTail(samples, compression)
         ϵ = violation(dist, β)
 
+        event!("ϵ", ϵ)
+
         # This will result in NaN β_roundtrip since divisor is zero, but it will only happen if samples == compression == 1.
         if ϵ[1] == 0.0
             reject!()
@@ -133,6 +150,8 @@
         samples, compression = sample_compression
         dist = CompressionTwoTail(samples, compression)
         ϵ = violation(dist, β)
+
+        event!("ϵ", ϵ)
 
         N = samples
         k = compression
