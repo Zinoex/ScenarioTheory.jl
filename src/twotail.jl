@@ -23,7 +23,7 @@ function violation(dist::CompressionTwoTail, β::Real; tol=1e-10)
     N = dist.samples
     k = dist.compressed
 
-    epps = eps(Float64)
+    epps = eps(tol)
 
     α_lower = 0
     α_upper = k / N

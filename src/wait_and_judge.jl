@@ -23,7 +23,7 @@ function violation(dist::WaitAndJudgeScenarioOptimization, β::Real; tol=1e-10)
     N = dist.samples
     k = dist.support
 
-    epps = eps(Float64)
+    epps = eps(tol)
 
     if N == k
         ϵ = 1.0
