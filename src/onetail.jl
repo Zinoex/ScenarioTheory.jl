@@ -19,24 +19,22 @@ struct CompressionOneTail <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::CompressionOneTail, β::Real; tol=1e-10)
+function violation(dist::CompressionOneTail, β::Real; tol_steps=20)
     N = dist.samples
     k = dist.compressed
-
-    epps = eps(tol)
 
     if N == k
         ϵ = 1.0
     else
         α_lower = 0.0
         α_upper = 1.0
-        while α_upper - α_lower > tol
+        while α_upper > nextfloat(α_lower)
             α = (α_lower + α_upper) / 2
 
             left = β * binomccdf(N, α, k)
             right = α * N * binompdf(N, α, k)
             
-            if left > right + epps
+            if left > nextfloat(right, tol_steps)
                 α_upper = α
             else
                 α_lower = α
@@ -44,5 +42,6 @@ function violation(dist::CompressionOneTail, β::Real; tol=1e-10)
         end
         ϵ = α_upper
     end
+
     return zero(ϵ), ϵ
 end

@@ -19,19 +19,17 @@ struct CompressionTwoTail <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::CompressionTwoTail, β::Real; tol=1e-10)
+function violation(dist::CompressionTwoTail, β::Real; tol_steps=20)
     N = dist.samples
     k = dist.compressed
 
-    epps = eps(tol)
-
-    α_lower = 0
+    α_lower = 0.0
     α_upper = k / N
-    while α_upper - α_lower > tol
+    while α_upper > nextfloat(α_lower)
         α = (α_lower + α_upper) / 2
         left = (β / 3) * binomccdf(N, α, k) + (β / 6) * binomccdf(4 * N + 1 - k, α, k)
         right = (1 + β / (6 * N)) * α * N * binompdf(N, α, k)
-        if left > right + epps
+        if left > nextfloat(right, tol_steps)
             α_lower = α
         else
             α_upper = α
@@ -43,12 +41,12 @@ function violation(dist::CompressionTwoTail, β::Real; tol=1e-10)
         ϵ_upper = 1.0
     else
         α_lower = k / N
-        α_upper = 1
-        while α_upper - α_lower > tol
+        α_upper = 1.0
+        while α_upper > nextfloat(α_lower)
             α = (α_lower + α_upper) / 2
             left = (β / 3) * binomccdf(N, α, k) + (β / 6) * binomccdf(4 * N + 1 - k, α, k)
             right = (1 + β / (6 * N)) * α * N * binompdf(N, α, k)
-            if left > right + epps
+            if left > nextfloat(right, tol_steps)
                 α_upper = α
             else
                 α_lower = α

@@ -19,7 +19,7 @@ struct ScenarioOptimization <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::ScenarioOptimization, β::Real; tol=1e-10)
+function violation(dist::ScenarioOptimization, β::Real; α_tol=1e-10, float_tol=20)
     N = dist.samples
     d = dist.decision_vars
     k = d - 1
@@ -30,11 +30,11 @@ function violation(dist::ScenarioOptimization, β::Real; tol=1e-10)
         α_lower = 0.0
         α_upper = 1.0
 
-        while α_upper - α_lower > tol
+        while α_upper > nextfloat(α_lower)
             α = (α_lower + α_upper) / 2
             β_mid = binomcdf(N, α, k)
 
-            if β_mid < β
+            if β > nextfloat(β_mid, float_tol)
                 α_upper = α
             else
                 α_lower = α

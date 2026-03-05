@@ -19,18 +19,16 @@ struct WaitAndJudgeScenarioOptimization <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::WaitAndJudgeScenarioOptimization, β::Real; tol=1e-10)
+function violation(dist::WaitAndJudgeScenarioOptimization, β::Real; tol_steps=20)
     N = dist.samples
     k = dist.support
-
-    epps = eps(tol)
 
     if N == k
         ϵ = 1.0
     else
         α_lower = 0.0
         α_upper = 1.0
-        while α_upper - α_lower > tol
+        while α_upper > nextfloat(α_lower)
             α = (α_lower + α_upper) / 2
 
             # \frac{\beta}{N + 1} \sum_{m=k}^N \binom{m}{k}(1-\alpha)^{m - k} - \binom{N}{k}(1-\alpha)^{N - k} = 0
@@ -46,7 +44,7 @@ function violation(dist::WaitAndJudgeScenarioOptimization, β::Real; tol=1e-10)
             left = β * binomccdf(N + 1, α, k)
             right = α * (N + 1) * binompdf(N, α, k)
             
-            if left > right + epps
+            if left > nextfloat(right, tol_steps)
                 α_upper = α
             else
                 α_lower = α

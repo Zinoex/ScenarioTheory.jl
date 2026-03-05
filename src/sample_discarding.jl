@@ -24,7 +24,7 @@ struct SampleDiscarding <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::SampleDiscarding, β::Real; tol=1e-10)
+function violation(dist::SampleDiscarding, β::Real; tol_steps=20)
     N = dist.samples
     d = dist.decision_vars
     k = dist.discarded
@@ -36,11 +36,11 @@ function violation(dist::SampleDiscarding, β::Real; tol=1e-10)
         α_lower = 0.0
         α_upper = 1.0
 
-        while α_upper - α_lower > tol
+        while α_upper > nextfloat(α_lower)
             α = (α_lower + α_upper) / 2
             β_mid = binomial(r, k) * binomcdf(N, r, α)
 
-            if β_mid > β
+            if β > nextfloat(β_mid, tol_steps)
                 α_upper = α
             else
                 α_lower = α
