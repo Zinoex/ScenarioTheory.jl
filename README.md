@@ -15,7 +15,7 @@ A goal is to also support inverse problems: given a desired confidence and (a bo
 
 To install the package, run the following command from a Julia REPL.
 ```julia
-(v1.11) pkg> add https://github.com/Zinoex/ScenarioTheory.jl
+(v1.11) pkg> add ScenarioTheory
 ```
 
 ## Usage
