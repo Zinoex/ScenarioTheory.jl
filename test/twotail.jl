@@ -137,7 +137,7 @@
         k = compression
 
         # Compute the roundtrip confidence using the regularized incomplete beta function.
-        β_lower_roundtrip = ϵ[1] * N * binompdf(N, ϵ[1], k) / (binomccdf(N, ϵ[1], k) / 3 + binomccdf(4 * N + 1 - k, ϵ[1], k) / 6 + ϵ[1] * N * binompdf(N, ϵ[1], k) / (6 * N))
+        β_lower_roundtrip = ϵ[1] * N * binompdf(N, ϵ[1], k) / (binomccdf(N, ϵ[1], k) / 3 + binomccdf(4 * N + 1 - k, ϵ[1], k) / 6 - ϵ[1] * N * binompdf(N, ϵ[1], k) / (6 * N))
         event!("β_lower_roundtrip", β_lower_roundtrip)
 
         # Check that given a β, we chose an ϵ such that the true violation is at most that much.
@@ -157,7 +157,7 @@
         k = compression
 
         # Compute the roundtrip confidence using the regularized incomplete beta function.
-        β_upper_roundtrip = ϵ[2] * N * binompdf(N, ϵ[2], k) / (binomccdf(N, ϵ[2], k) / 3 + binomccdf(4 * N + 1 - k, ϵ[2], k) / 6 + ϵ[2] * N * binompdf(N, ϵ[2], k) / (6 * N))
+        β_upper_roundtrip = ϵ[2] * N * binompdf(N, ϵ[2], k) / (binomccdf(N, ϵ[2], k) / 3 + binomccdf(4 * N + 1 - k, ϵ[2], k) / 6 - ϵ[2] * N * binompdf(N, ϵ[2], k) / (6 * N))
         event!("β_upper_roundtrip", β_upper_roundtrip)
 
         # Check that given a β, we chose an ϵ such that the true violation is at most that much.
