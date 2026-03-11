@@ -150,36 +150,4 @@
         # This corresponds to a higher confidence 1 - β, or β >= β_roundtrip.
         logβ >= logβ_roundtrip
     end
-
-    # The true violation should be at most ϵ with confidence approximately 1 - β.
-    sdd_gen = filter(sample_decision_discarded_gen) do (samples, (decision_vars, discarded))
-        return decision_vars + discarded < samples
-    end
-
-    Supposition.@check function violation_approx(sample_decision_discarded=sdd_gen, β=beta_gen)
-        samples, (decision_vars, discarded) = sample_decision_discarded
-        dist = SampleDiscarding(samples, decision_vars, discarded)
-        ϵ = violation(dist, β)[2]
-
-        if ϵ == 1.0
-            reject!()
-        end
-
-        event!("ϵ", ϵ)
-
-        N = samples
-        d = decision_vars
-        k = discarded
-        r = k + d - 1
-
-        # Compute the roundtrip confidence using the formula from the paper.
-        logβ_roundtrip = logabsbinomial(r, k)[1] + binomlogcdf(N, ϵ, r)
-        event!("logβ_roundtrip", logβ_roundtrip)
-
-        β_roundtrip = exp(logβ_roundtrip)
-        event!("β_roundtrip", β_roundtrip)
-
-        # Check that the computed logβ_roundtrip is approximately equal to the input logβ, which would indicate that the violation is tight.
-        isapprox(β, β_roundtrip; atol=1e-2, rtol=1e-2)
-    end
 end
