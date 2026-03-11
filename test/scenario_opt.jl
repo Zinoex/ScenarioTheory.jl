@@ -121,4 +121,27 @@
         # This corresponds to a higher confidence 1 - β, or β >= β_roundtrip.
         β >= β_roundtrip
     end
+
+    # The true violation should be at most ϵ with confidence approximately 1 - β.
+    sdv_gen = filter(sample_decision_vars_gen) do (samples, decision_vars)
+        return decision_vars < samples
+    end
+
+    Supposition.@check function violation_approx(sample_decision_vars=sdv_gen, β=beta_gen)
+        samples, decision_vars = sample_decision_vars
+        dist = ScenarioOptimization(samples, decision_vars)
+        ϵ = violation(dist, β)[2]
+
+        event!("ϵ", ϵ)
+
+        N = samples
+        k = decision_vars - 1
+
+        # Compute the roundtrip confidence using the regularized incomplete beta function.
+        β_roundtrip = binomcdf(N, ϵ, k)
+        event!("β_roundtrip", β_roundtrip)
+
+        # Check that the computed β_roundtrip is approximately equal to the input β, which would indicate that the violation is tight.
+        isapprox(β, β_roundtrip)
+    end
 end

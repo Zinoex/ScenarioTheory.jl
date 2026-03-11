@@ -121,4 +121,27 @@
         # This corresponds to a higher confidence 1 - β, or β >= β_roundtrip.
         β >= β_roundtrip
     end
+
+    # The true violation should be at most ϵ with confidence approximately 1 - β.
+    sc_gen = filter(sample_compression_gen) do (samples, compression)
+        return compression < samples
+    end
+
+    Supposition.@check function violation_approx(sample_compression=sc_gen, β=beta_gen)
+        samples, compression = sample_compression
+        dist = CompressionOneTail(samples, compression)
+        ϵ = violation(dist, β)[2]
+
+        event!("ϵ", ϵ)
+
+        N = samples
+        k = compression
+
+        # Compute the roundtrip confidence using the regularized incomplete beta function.
+        β_roundtrip = ϵ * N * binompdf(N, ϵ, k) / binomccdf(N, ϵ, k)
+        event!("β_roundtrip", β_roundtrip)
+
+        # Check that the computed β_roundtrip is approximately equal to the input β, which would indicate that the violation is tight.
+        isapprox(β, β_roundtrip)
+    end
 end

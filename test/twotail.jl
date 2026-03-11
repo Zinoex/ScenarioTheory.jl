@@ -164,4 +164,55 @@
         # This corresponds to a higher confidence 1 - β, or β >= β_upper_roundtrip.
         β >= β_upper_roundtrip
     end
+
+    # The true violation should be at most ϵ with confidence approximately 1 - β.
+    sc_gen = filter(sample_compression_gen) do (samples, compression)
+        return compression < samples
+    end
+
+    Supposition.@check function violation_lower_approx(sample_compression=sc_gen, β=beta_gen)
+        samples, compression = sample_compression
+        dist = CompressionTwoTail(samples, compression)
+        ϵ = violation(dist, β)
+
+        event!("ϵ", ϵ)
+
+        # This will result in NaN β_roundtrip since divisor is zero, but it will only happen if samples == compression == 1.
+        if ϵ[1] == 0.0
+            reject!()
+        end
+
+        N = samples
+        k = compression
+
+        # Compute the roundtrip confidence using the regularized incomplete beta function.
+        β_lower_roundtrip = ϵ[1] * N * binompdf(N, ϵ[1], k) / (binomccdf(N, ϵ[1], k) / 3 + binomccdf(4 * N + 1 - k, ϵ[1], k) / 6 - ϵ[1] * N * binompdf(N, ϵ[1], k) / (6 * N))
+        event!("β_lower_roundtrip", β_lower_roundtrip)
+
+        # Check that the computed β_roundtrip is approximately equal to the input β, which would indicate that the violation is tight.
+        isapprox(β, β_lower_roundtrip)
+    end
+
+    # The true violation should be at most ϵ with confidence approximately 1 - β.
+    sc_gen = filter(sample_compression_gen) do (samples, compression)
+        return compression < samples
+    end
+
+    Supposition.@check function violation_upper_approx(sample_compression=sc_gen, β=beta_gen)
+        samples, compression = sample_compression
+        dist = CompressionTwoTail(samples, compression)
+        ϵ = violation(dist, β)
+
+        event!("ϵ", ϵ)
+
+        N = samples
+        k = compression
+
+        # Compute the roundtrip confidence using the regularized incomplete beta function.
+        β_upper_roundtrip = ϵ[2] * N * binompdf(N, ϵ[2], k) / (binomccdf(N, ϵ[2], k) / 3 + binomccdf(4 * N + 1 - k, ϵ[2], k) / 6 - ϵ[2] * N * binompdf(N, ϵ[2], k) / (6 * N))
+        event!("β_upper_roundtrip", β_upper_roundtrip)
+
+        # Check that the computed β_roundtrip is approximately equal to the input β, which would indicate that the violation is tight.
+        isapprox(β, β_upper_roundtrip)
+    end
 end
