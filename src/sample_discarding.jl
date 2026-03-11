@@ -24,10 +24,10 @@ struct SampleDiscarding <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::SampleDiscarding, β::Real; tol_steps=20)
-    N = dist.samples
-    d = dist.decision_vars
-    k = dist.discarded
+function violation(theory::SampleDiscarding, β::Real; tol_steps=20)
+    N = theory.samples
+    d = theory.decision_vars
+    k = theory.discarded
     r = k + d - 1
 
     logbeta = log(β)

@@ -19,9 +19,9 @@ struct ScenarioOptimization <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::ScenarioOptimization, β::Real; α_tol=1e-10, float_tol=20)
-    N = dist.samples
-    d = dist.decision_vars
+function violation(theory::ScenarioOptimization, β::Real; α_tol=1e-10, float_tol=20)
+    N = theory.samples
+    d = theory.decision_vars
     k = d - 1
 
     if N == d

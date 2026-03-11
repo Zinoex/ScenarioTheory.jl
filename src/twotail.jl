@@ -19,9 +19,9 @@ struct CompressionTwoTail <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::CompressionTwoTail, β::Real; tol_steps=20)
-    N = dist.samples
-    k = dist.compressed
+function violation(theory::CompressionTwoTail, β::Real; tol_steps=20)
+    N = theory.samples
+    k = theory.compressed
 
     α_lower = 0.0
     α_upper = k / N

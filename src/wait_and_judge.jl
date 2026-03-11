@@ -19,9 +19,9 @@ struct WaitAndJudge <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::WaitAndJudge, β::Real; tol_steps=20)
-    N = dist.samples
-    k = dist.support
+function violation(theory::WaitAndJudge, β::Real; tol_steps=20)
+    N = theory.samples
+    k = theory.support
 
     if N == k
         ϵ = 1.0

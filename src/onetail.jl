@@ -19,9 +19,9 @@ struct CompressionOneTail <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::CompressionOneTail, β::Real; tol_steps=20)
-    N = dist.samples
-    k = dist.compressed
+function violation(theory::CompressionOneTail, β::Real; tol_steps=20)
+    N = theory.samples
+    k = theory.compressed
 
     if N == k
         ϵ = 1.0

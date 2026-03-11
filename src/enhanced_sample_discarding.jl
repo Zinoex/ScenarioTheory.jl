@@ -24,10 +24,10 @@ struct EnhancedSampleDiscarding <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::EnhancedSampleDiscarding, β::Real; tol_steps=20)
-    N = dist.samples
-    d = dist.decision_vars
-    k = dist.discarding_rounds
+function violation(theory::EnhancedSampleDiscarding, β::Real; tol_steps=20)
+    N = theory.samples
+    d = theory.decision_vars
+    k = theory.discarding_rounds
     r = k + d - 1
 
     if N == d * (1 + k)
