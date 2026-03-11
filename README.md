@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/Zinoex/ScenarioTheory.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/Zinoex/ScenarioTheory.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/Zinoex/ScenarioTheory.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Zinoex/ScenarioTheory.jl)
+[![Fuzzy Tests](https://raw.githubusercontent.com/Seelengrab/Supposition.jl/main/badge.svg)](https://github.com/Seelengrab/Supposition.jl)
 
 This package provides computation of various bounds of the Scenario Theory pioneered by Marco Campi and Simone Garatti [1]. Scenario theory is commonly framed as optimization [1] or compression [2]; _this package supports neither_. Instead, the purpose is, given the number of samples, the desired confidence, and the number of decision variables/support constraints/compressed size, to compute the level of violation defined as the probability of a change of compression. 
 
