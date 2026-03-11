@@ -1,6 +1,7 @@
 module ScenarioTheory
 
-using StatsFuns: binompdf, binomcdf, binomccdf
+using StatsFuns: binompdf, binomcdf, binomccdf, binomlogcdf
+using SpecialFunctions: logabsbinomial
 
 abstract type AbstractScenarioTheory end
 
@@ -16,9 +17,12 @@ include("scenario_opt.jl")
 export ScenarioOptimization
 
 include("wait_and_judge.jl")
-export WaitAndJudgeScenarioOptimization
+export WaitAndJudge
 
-# include("sample_discarding.jl")
-# export SampleDiscardingScenarioOptimization
+include("sample_discarding.jl")
+export SampleDiscarding
+
+include("enhanced_sample_discarding.jl")
+export EnhancedSampleDiscarding
 
 end

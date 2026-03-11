@@ -8,12 +8,12 @@ struct SampleDiscarding <: AbstractScenarioTheory
             throw(DomainError(samples, "expected samples ≥ 1"))
         end
 
-        if discarded < 0
-            throw(DomainError(discarded, "expected discarded ≥ 0"))
-        end
-
         if decision_vars < 1
             throw(DomainError(decision_vars, "expected decision_vars ≥ 1"))
+        end
+
+        if discarded < 0
+            throw(DomainError(discarded, "expected discarded ≥ 0"))
         end
         
         if decision_vars + discarded > samples
@@ -30,7 +30,9 @@ function violation(dist::SampleDiscarding, β::Real; tol_steps=20)
     k = dist.discarded
     r = k + d - 1
 
-    if N == d
+    logbeta = log(β)
+
+    if N == k + d
         ϵ = 1.0
     else
         α_lower = 0.0
@@ -38,9 +40,9 @@ function violation(dist::SampleDiscarding, β::Real; tol_steps=20)
 
         while α_upper > nextfloat(α_lower)
             α = (α_lower + α_upper) / 2
-            β_mid = binomial(r, k) * binomcdf(N, r, α)
+            logβ_mid = logabsbinomial(r, k)[1] + binomlogcdf(N, α, r)
 
-            if β > nextfloat(β_mid, tol_steps)
+            if logbeta > nextfloat(logβ_mid, tol_steps)
                 α_upper = α
             else
                 α_lower = α

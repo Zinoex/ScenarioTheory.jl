@@ -1,9 +1,9 @@
 @testset "Wait-and-judge Scenario Optimization" begin
     @testset "Errors" begin
-        @test_throws DomainError WaitAndJudgeScenarioOptimization(0, 0)
-        @test_throws ArgumentError WaitAndJudgeScenarioOptimization(10, 11)
-        @test_throws DomainError WaitAndJudgeScenarioOptimization(-1, 0)
-        @test_throws DomainError WaitAndJudgeScenarioOptimization(10, -1)
+        @test_throws DomainError WaitAndJudge(0, 0)
+        @test_throws ArgumentError WaitAndJudge(10, 11)
+        @test_throws DomainError WaitAndJudge(-1, 0)
+        @test_throws DomainError WaitAndJudge(10, -1)
     end
 
     # 10M samples should be good enough for testing purposes, but we can go higher if needed.
@@ -25,7 +25,7 @@
 
     Supposition.@check function violation_ranges(sample_support=ss_gen, β=beta_gen)
         samples, support = sample_support
-        dist = WaitAndJudgeScenarioOptimization(samples, support)
+        dist = WaitAndJudge(samples, support)
         ϵ = violation(dist, β)
 
         event!("ϵ", ϵ)
@@ -35,7 +35,7 @@
 
     # Check that if samples == support, then ϵ = 1.0
     Supposition.@check function samples_equal_support(samples=samples_gen, β=beta_gen)
-        dist = WaitAndJudgeScenarioOptimization(samples, samples)
+        dist = WaitAndJudge(samples, samples)
         ϵ = violation(dist, β)
 
         event!("ϵ", ϵ)
@@ -51,10 +51,10 @@
     Supposition.@check function successor_support(sample_support=ss_gen, β=beta_gen)
         samples, support = sample_support
 
-        dist1 = WaitAndJudgeScenarioOptimization(samples, support)
+        dist1 = WaitAndJudge(samples, support)
         ϵ1 = violation(dist1, β)
         
-        dist2 = WaitAndJudgeScenarioOptimization(samples, support + 1)
+        dist2 = WaitAndJudge(samples, support + 1)
         ϵ2 = violation(dist2, β)
 
         event!("ϵ1", ϵ1)
@@ -71,10 +71,10 @@
     Supposition.@check function successor_samples(sample_support=ss_gen, β=beta_gen)
         samples, support = sample_support
 
-        dist1 = WaitAndJudgeScenarioOptimization(samples, support)
+        dist1 = WaitAndJudge(samples, support)
         ϵ1 = violation(dist1, β)
 
-        dist2 = WaitAndJudgeScenarioOptimization(samples + 1, support)
+        dist2 = WaitAndJudge(samples + 1, support)
         ϵ2 = violation(dist2, β)
 
         event!("ϵ1", ϵ1)
@@ -92,7 +92,7 @@
         samples, support = sample_support
         β1, β2 = β
 
-        dist = WaitAndJudgeScenarioOptimization(samples, support)
+        dist = WaitAndJudge(samples, support)
         ϵ1 = violation(dist, β1)
         ϵ2 = violation(dist, β2)
 
@@ -105,7 +105,7 @@
     # Soundness: the true violation should be at most ϵ with confidence at least β.
     Supposition.@check function violation_soundness(sample_support=ss_gen, β=beta_gen)
         samples, support = sample_support
-        dist = WaitAndJudgeScenarioOptimization(samples, support)
+        dist = WaitAndJudge(samples, support)
         ϵ = violation(dist, β)[2]
 
         event!("ϵ", ϵ)
@@ -129,7 +129,7 @@
 
     Supposition.@check function violation_approx(sample_support=ss_gen, β=beta_gen)
         samples, support = sample_support
-        dist = WaitAndJudgeScenarioOptimization(samples, support)
+        dist = WaitAndJudge(samples, support)
         ϵ = violation(dist, β)[2]
 
         event!("ϵ", ϵ)

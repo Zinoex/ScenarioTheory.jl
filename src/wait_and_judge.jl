@@ -1,8 +1,8 @@
-struct WaitAndJudgeScenarioOptimization <: AbstractScenarioTheory
+struct WaitAndJudge <: AbstractScenarioTheory
     samples::Int
     support::Int
 
-    function WaitAndJudgeScenarioOptimization(samples::Int, support::Int)
+    function WaitAndJudge(samples::Int, support::Int)
         if samples < 1
             throw(DomainError(samples, "expected samples ≥ 1"))
         end
@@ -19,7 +19,7 @@ struct WaitAndJudgeScenarioOptimization <: AbstractScenarioTheory
     end
 end
 
-function violation(dist::WaitAndJudgeScenarioOptimization, β::Real; tol_steps=20)
+function violation(dist::WaitAndJudge, β::Real; tol_steps=20)
     N = dist.samples
     k = dist.support
 

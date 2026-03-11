@@ -83,11 +83,11 @@ samples = 1500
 support_constraints = 10
 β = 1e-6  # the confidence is 1 - β
 
-theory = WaitAndJudgeScenarioOptimization(samples, support_constraints)
+theory = WaitAndJudge(samples, support_constraints)
 
 ϵ_lower, ϵ_upper = violation(theory, β)
 ```
-`ϵ_lower` is always zero for `WaitAndJudgeScenarioOptimization`.
+`ϵ_lower` is always zero for `WaitAndJudge`.
 
 
 ### One-tail change of compression
