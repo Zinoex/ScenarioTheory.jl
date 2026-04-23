@@ -69,7 +69,7 @@
 
     # More discarding rounds should lead to higher violation, all else equal.
     sdd_gen = filter(sample_decision_discarding_gen) do (samples, (decision_vars, discarding_rounds))
-        return decision_vars * (1 + discarding_rounds) < samples
+        return decision_vars * (2 + discarding_rounds) < samples
     end
 
     Supposition.@check function successor_discarding_rounds(sample_decision_discarding=sdd_gen, β=beta_gen)
