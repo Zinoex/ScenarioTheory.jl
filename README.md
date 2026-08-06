@@ -92,7 +92,7 @@ theory = WaitAndJudge(samples, support_constraints)
 
 ### One-tail change of compression
 
-This theory is a modern reformulation and generalization in terms of compression. To this end, let $D$ be a multi-set sampled according to $\mathbb{P}^N$ and assume a given compression function $c$ such that $c(D) \subset D$ for all $D$. The change of compression is defined as $\phi(D) = \mathbb{P}[c(c(D), \delta) != c(D) | D]$. Let $k$ be cardinality of $D$. Then, $\mathbb{P}^N[\phi(D) < \epsilon] \geq 1 - \beta$ where $\epsilon$ is a function of $N$, $k$, and $\beta$. For a more in-depth explanation, please refer to [3].
+This theory is a modern reformulation and generalization in terms of compression. To this end, let $D$ be a multi-set sampled according to $\mathbb{P}^N$ and assume a given compression function $c$ such that $c(D) \subset D$ for all $D$. The change of compression is defined as $\phi(D) = \mathbb{P}[c(c(D), \delta) \neq c(D) | D]$. Let $k$ be cardinality of $D$. Then, $\mathbb{P}^N[\phi(D) < \epsilon] \geq 1 - \beta$ where $\epsilon$ is a function of $N$, $k$, and $\beta$. For a more in-depth explanation, please refer to [3].
 
 > [!WARNING]
 > The theory requires that compression function satisfies a preference property (see [3]). This is not checked by this code (it does not have access to the compression function); it is your responsibility to check that. 
